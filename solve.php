@@ -11,41 +11,71 @@
         [   3,null,null,null,null,null,null,   8,null],
         [null,   6,   9,null,   3,null,null,   5,null],
         [null,null,   7,null,   4,null,null,   1,null]];
-    
-    function getrow($row) {
+
+        $posible_numbers = [1,2,3,4,5,6,7,8,9];
+
+    function get_row($row) {
         global $board;
-        $posibleNumbers = [1,2,3,4,5,6,7,8,9];
-        echo 'row<br>';
+        global $posible_numbers;
         foreach ($board[$row] as $number) {
-            if (is_numeric($number)) {
-                unset($posibleNumbers[array_search($number, $posibleNumbers)]);
+            if (in_array($number, $posible_numbers)) {
+                unset($posible_numbers[array_search($number, $posible_numbers)]);
             }
         }
-        return $posibleNumbers;
     }
 
-    function getCol($col) {
+    function get_col($col) {
         global $board;
-        echo 'colum<br>';
+        global $posible_numbers;
         foreach (array_column($board, $col) as $number) {
-            var_dump($number);
-            echo "<br>";
+            if (in_array($number, $posible_numbers)) {
+                unset($posible_numbers[array_search($number, $posible_numbers)]);
+            }
         }
     }
 
-    function getBox($row, $col) {
+    function get_box($row, $col) {
         global $board;
+        global $posible_numbers;
         $maxBoxRow = ($row<3)*3+(($row>=3)*($row<6))*6+(($row>=6)*($row<9))*9;
         $maxBoxCol = ($col<3)*3+(($col>=3)*($col<6))*6+(($col>=6)*($col<9))*9;
 
-        echo 'box<br>';
         for ($i=($maxBoxRow-3); $i < $maxBoxRow; $i++) { 
             for ($j=($maxBoxCol-3); $j < $maxBoxCol; $j++) {
-                var_dump($board[$i][$j]);
-                echo " ";
+                $number = $board[$i][$j];
+                if (in_array($number, $posible_numbers)) {
+                    unset($posible_numbers[array_search($number, $posible_numbers)]);
+                }
             }
-            echo "<br>";
         }
     }
 
-    var_dump(getrow(3));
+    function get_posible($row, $col) {
+        get_row($row);
+        get_col($col);
+        get_box($row, $col);
+    }
+
+    $finished = false;
+    while (!$finished) {
+        $finished = true;
+        for ($i=0; $i < count($board[0]); $i++) { 
+            for ($j=0; $j < count($board); $j++) { 
+                if($board[$i][$j] == null) {
+                    $finished = false;
+                    $posible_numbers = [1,2,3,4,5,6,7,8,9];
+                    get_posible($i, $j);
+                    if(count($posible_numbers) == 1) {
+                        $board[$i][$j] = $posible_numbers[array_keys($posible_numbers)[0]];
+                    }
+                }
+            }
+        }
+    }
+
+    for ($i=0; $i < count($board[0]); $i++) { 
+        for ($j=0; $j < count($board); $j++) { 
+            echo $board[$i][$j];
+        }
+        echo '<br>';
+    }
