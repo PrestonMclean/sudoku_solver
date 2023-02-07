@@ -64,47 +64,40 @@
 
     function solve () {
         global $board;
-        $not_finished = true;
+
         $previous = [];
         $numbers_tried = [];
         $temp = null;
 
-        while ($not_finished) {
-            $not_finished = false;
-            for ($i=0; $i < count($board[0]); $i++) {
-                for ($j=0; $j < count($board); $j++) {
-                    if ($temp != null) {
-                        $i = $temp[1];
-                        $j = $temp[2];
-                        $board[$i][$j] = null;
-                        $temp = null;
+        for ($i=0; $i < count($board[0]); $i++) {
+            for ($j=0; $j < count($board); $j++) {
+                if ($temp != null) {
+                    $i = $temp[1];
+                    $j = $temp[2];
+                    $board[$i][$j] = null;
+                    $temp = null;
+                }
+                if($board[$i][$j] == null) {
+                    $posible_numbers = [1,2,3,4,5,6,7,8,9];
+                    posible_numbers($i, $j, $posible_numbers);
+                    if ($numbers_tried != null) {
+                        possible_numbers_tried($numbers_tried, $posible_numbers);
                     }
-                    if($board[$i][$j] == null) {
-                        $posible_numbers = [1,2,3,4,5,6,7,8,9];
-                        posible_numbers($i, $j, $posible_numbers);
+                    $size_of_possible_numbers = count($posible_numbers);
+                    if($size_of_possible_numbers > 0) {
+                        $random_index = array_keys($posible_numbers)[rand(0, $size_of_possible_numbers-1)];
+                        $board[$i][$j] = $posible_numbers[$random_index];
                         if ($numbers_tried != null) {
-                            possible_numbers_tried($numbers_tried, $posible_numbers);
-                        }
-
-                        $size_of_possible_numbers = count($posible_numbers);
-                        if($size_of_possible_numbers > 0) {
-                            $random_index = array_keys($posible_numbers)[rand(0, $size_of_possible_numbers-1)];
-                            $board[$i][$j] = $posible_numbers[$random_index];
-
-                            if ($numbers_tried != null) {
-                                array_push($numbers_tried, $board[$i][$j]);
-                            } else {
-                                $numbers_tried = array($board[$i][$j]);
-                            }
-                            $current = [$numbers_tried, $i, $j];
-                            $numbers_tried = null;
-                            array_push($previous, $current);
-
+                            array_push($numbers_tried, $board[$i][$j]);
                         } else {
-                            $not_finished = true;
-                            $temp = array_pop($previous);
-                            $numbers_tried = $temp[0];
+                            $numbers_tried = array($board[$i][$j]);
                         }
+                        $current = [$numbers_tried, $i, $j];
+                        $numbers_tried = null;
+                        array_push($previous, $current);
+                    } else {
+                        $temp = array_pop($previous);
+                        $numbers_tried = $temp[0];
                     }
                 }
             }
